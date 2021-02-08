@@ -1,7 +1,10 @@
 from tkinter import *
-import time
+import time, sched
 from tkinter import messagebox
 import tkinter as tk
+import datetime
+
+
 # from crontab import CronTab
 # pip install python-crontab
 # https://stackabuse.com/scheduling-jobs-with-python-crontab/
@@ -16,6 +19,12 @@ class Clock:
         self.root.configure(bg='black')
         self.root.title('AlarmClock')
         self.root.geometry("400x250+200+100")
+        self.stand = ""
+        self.goSleep = ""
+        self.sleepingTime = '22:00'
+        self.standingTimeMin = 30
+        self.s = sched.scheduler(time.time, time.sleep)
+        
 
         self.watch = Label(self.root, text=self.time,  font=("Helvetica", 48), fg="green", bg="black") 
         self.watch.pack(pady=20)
@@ -26,20 +35,35 @@ class Clock:
         self.sleep = Label(root, text="", font=("Helvetica", 22, "bold"), fg="red", bg="black")
         self.sleep.pack()
 
-        self.changeLabel() #first call it manually
+        # self.sleepingTimeLabel = Label(root, text="Time to go to sleep: "+ self.sleepingTime, font=("Helvetica", 10), fg="red", bg="black")
+        # self.sleepingTimeLabel.pack(side = LEFT, pady=10, padx=10)
 
+        self.changeLabel() 
+      
     def changeLabel(self): 
         self.time2 = time.strftime('%H:%M:%S')
         self.watch.configure(text=self.time2)
-        self.root.after(1000, self.changeLabel) #it'll call itself continuously
-
-        self.stand = "SEISO"
+        self.root.after(1000, self.changeLabel)
         self.sit.configure(text=self.stand)
-
-        self.goSleep = "fsdf"
         self.sleep.configure(text=self.goSleep)
 
+        # Call sched -timer       
+        self.s.enter(2,1,self.job(), argument=('positional',))
+
+    def job(self):
+        now = datetime.datetime.now().time()
+        
+        if now.minute > self.standingTimeMin and now.minute <= 59:
+            self.stand = "ISTU"
+        else:
+            self.stand = "SEISO"
+        
+        if now > datetime.datetime.strptime(self.sleepingTime, '%H:%M').time():
+            self.goSleep = "MENE NUKKUMAAN"
+
 obj1 = Clock()
+
+
 root.mainloop()
 
 
